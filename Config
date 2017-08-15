@@ -1,0 +1,34 @@
+# *********************** #
+# Configure distribution. #
+# *********************** #
+
+VERSION  = 0.8
+TARNAME  = bbdump-$(VERSION)
+
+# *********************** #
+# Configure installation. #
+# *********************** #
+
+DESTDIR ?=
+PREFIX  ?= /usr/local
+INCDIR   = $(PREFIX)/include
+BINDIR   = $(PREFIX)/bin
+
+# ********************** #
+# Configure compilation. #
+# ********************** #
+
+CC      ?= cc
+CFLAGS  ?=
+LDFLAGS ?=
+
+ALL_CFLAGS  = -std=c89 -pedantic -Wall -Wextra \
+	-Wno-unknown-warning-option -Wno-unused-parameter \
+	-DBBDUMP_VERSION=$(VERSION) -O2
+ALL_LDFLAGS = -s
+
+# Disable all font effects.
+#ALL_CFLAGS  += -DANSICOLOR_OFF
+
+ALL_CFLAGS  += $(CFLAGS)
+ALL_LDFLAGS += $(LDFLAGS)
