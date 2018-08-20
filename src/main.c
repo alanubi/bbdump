@@ -1,40 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <bbdump/specifier.h>
-#include <bbdump/ansicolor.h>
-#include <bbdump/switch.h>
-#include "color.h"
+#include <bbmacro/label.h>
+#include <bbmacro/static.h>
 #include "loop.h"
 #include "defaults.h"
 
-#define BYTES_PER_GROUP  4
+#define BYTES_PER_GROUP 4
 #define GROUPS_PER_QWORD 2
 
-#define xstr(codename) ANSICOLOR_XSTR(codename)
+#if DEFAULT_RIGHT_TO_LEFT == 1
+#  define DEFAULT_DIRECTION_FLAG "r"
+#else
+#  define DEFAULT_DIRECTION_FLAG "l"
+#endif
 
-#define MAX_CHARS_PER_LINE(contents, lesser_space, greater_space) \
-	((((contents) \
-		+ MAX_SETRESET_OVERHEAD + (lesser_space)) \
-		* BYTES_PER_GROUP \
-		- (lesser_space) + (greater_space)) \
-		* GROUPS_PER_QWORD * 8 /* max qwords per line */ \
-		- (greater_space) + 1 /* null character */)
-
-/* KEEP UP TO DATE! */
-char line_bytes[MAX_CHARS_PER_LINE(2, 1, 2)];
-char line_ascii[MAX_CHARS_PER_LINE(1, 0, 0)];
-
-static NORETURN void usage()
+static BBNORETURN void usage(void)
 {
 	fputs(
-"bbdump "xstr(BBDUMP_VERSION)"\n"
-"Usage: bbdump [-cN|-qN|-vN]...\n"
+"bbdump "bbstatic_xstr(BBDUMP_VERSION)"\n"
+"Usage: bbdump [-cN|-qN|-vN|-l|-r]...\n"
 "  -cN  - coloring mode N (0-3)\n"
 "  -qN  - N qwords per line (1-8)\n"
 "  -vN  - verbosity level N (0-2)\n"
-"Default: bbdump -c"xstr(DEFAULT_COLORING_MODE)
-	" -q"xstr(DEFAULT_QWORDS_PER_LINE)
-	" -v"xstr(DEFAULT_VERBOSITY_LEVEL)"\n"
+"  -l   - left-to-right output\n"
+"  -r   - right-to-left output\n"
+"Default: bbdump -c"bbstatic_xstr(DEFAULT_COLORING_MODE)
+	" -q"bbstatic_xstr(DEFAULT_QWORDS_PER_LINE)
+	" -v"bbstatic_xstr(DEFAULT_VERBOSITY_LEVEL)
+	" -"DEFAULT_DIRECTION_FLAG"\n"
 		"", stderr);
 	exit(1);
 }
@@ -63,10 +56,25 @@ static int option_v(char *arg)
 	usage();
 }
 
-int main(int argc, char *argv[])
+static int option_l(char *arg)
+{
+	if (!arg[0])
+		return 0;
+	usage();
+}
+
+static int option_r(char *arg)
+{
+	if (!arg[0])
+		return 1;
+	usage();
+}
+
+int main(BBUNUSED int argc, char *argv[])
 {
 	int coloring_mode = DEFAULT_COLORING_MODE;
 	int verbosity_level = DEFAULT_VERBOSITY_LEVEL;
+	int right_to_left = DEFAULT_RIGHT_TO_LEFT;
 	unsigned qwords_per_line = DEFAULT_QWORDS_PER_LINE;
 	unsigned groups_per_line;
 	char *arg;
@@ -78,10 +86,12 @@ int main(int argc, char *argv[])
 		when ('c') coloring_mode = option_c(&arg[2]);
 		when ('q') qwords_per_line = option_q(&arg[2]);
 		when ('v') verbosity_level = option_v(&arg[2]);
-		otherwise  usage();
+		when ('l') right_to_left = option_l(&arg[2]);
+		when ('r') right_to_left = option_r(&arg[2]);
+		otherwise usage();
 		}
 	}
 	groups_per_line = qwords_per_line * GROUPS_PER_QWORD;
-	return loop(coloring_mode, verbosity_level,
+	return loop(coloring_mode, verbosity_level, right_to_left,
 		BYTES_PER_GROUP, groups_per_line);
 }

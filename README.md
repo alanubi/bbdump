@@ -5,21 +5,14 @@
 ### Contents of the package
 
 `bbdump`
-> The program that visualize its input in hexadecimal format.
+> The program that visualizes its input in hexadecimal format.
 > The visualization can look pretty nice!
 
-`bbdump/ansicolor.h`
-> The macro header for colorizing output using ANSI escape codes.
-> Plain escape codes, low-level macros and high-level macros are provided.
+---
+### System requirements
 
-`bbdump/switch.h` and `bbdump/label.h`
-> The headers with tiny but very useful macros.
-> With their help you can avoid `break` statements in `switch`,
-> organize your loops in a different (and better) way
-> and improve `goto`-filled error checking of initializations.
-
-`bbdump/specifier.h`
-> The header with portable function specifiers (INLINE and NORETURN).
+Make sure you have installed `bbmacro` library of version `0.5`.
+It would be good if your system supports ANSI escape codes.
 
 ---
 ### Installation
@@ -37,18 +30,10 @@ Now you can check how the program works *(optional step)*:
     $ make show
 
 You can adjust the defaults of your installation
-by editing the file `defaults.h` and rebuilding the program.
+by editing the file `src/defaults.h` and building the program again.
 
-You can also check the macro headers *(optional step)*:
-
-    $ make demo
-    $ build/syntax_a
-    $ build/syntax_b
-    $ build/ansicolor_a
-    $ build/ansicolor_b
-
-And finally, install the program and the macro headers
-(you need superuser privileges):
+And finally, install the program
+(you need the superuser privileges):
 
     # make install
 
